@@ -6,8 +6,6 @@
 #include <time.h>
 #include <stb/stb_image.h>
 #include <Core/Engine.h>
-#include "Object2D.h"
-#include "Transform2D.h"
 #include "Camera.h"
 
 using namespace std;
@@ -27,7 +25,6 @@ float myrotation = 0;
 bool birdEyeView = true;
 Mesh* ground;
 bool turn = true;
-
 
 void TerrainGenerator::Init()
 {
@@ -50,8 +47,8 @@ void TerrainGenerator::Init()
 
 	{
 		Shader* shader = new Shader("ShaderGround");
-		shader->AddShader("Source/Game/Shaders/VertexShader3.glsl", GL_VERTEX_SHADER);
-		shader->AddShader("Source/Game/Shaders/FragmentShader3.glsl", GL_FRAGMENT_SHADER);
+		shader->AddShader("Source/Game/Shaders/VertexShader.glsl", GL_VERTEX_SHADER);
+		shader->AddShader("Source/Game/Shaders/FragmentShader.glsl", GL_FRAGMENT_SHADER);
 		shader->CreateAndLink();
 		shaders[shader->GetName()] = shader;
 	}
@@ -96,13 +93,13 @@ void TerrainGenerator::ShootProjectile(bool turn)
 	int maxSpeed = 7;
 
 	float modif = (rand() % (maxSpeed - minSpeed) * 1000) / 1000.0f + minSpeed;
-		
+
 	projectileVx = modif * camera->forward.x;
 	projectileVz = modif * camera->forward.z;
 	projectileVy = modif * camera->forward.y + maxSpeed - minSpeed;
 
 	projectilePosition = camera->position;
-	if(birdEyeView)
+	if (birdEyeView)
 		camera->Set(OverviewCameraPosition, OverviewCameraForward, OverviewCameraRight, OverviewCameraUp);
 }
 
@@ -110,7 +107,6 @@ bool colided = false;
 int collisionArea = 0;
 void TerrainGenerator::Update(float deltaTimeSeconds)
 {
-
 	glm::mat4 modelMatrix = glm::mat4(1);
 	modelMatrix = glm::translate(modelMatrix, glm::vec3(0, 1, 0));
 	RenderSimpleMesh(meshes["terrain"], shaders["ShaderGround"], modelMatrix, glm::vec3(1.0f, 0.0f, 0.0f), mapTextures["earth"]);
@@ -118,7 +114,7 @@ void TerrainGenerator::Update(float deltaTimeSeconds)
 	{
 		// Render projectile
 		glm::mat4 modelMatrix = glm::mat4(1);
-		projectilePosition += glm::vec3(projectileVx * deltaTimeSeconds, projectileVy * deltaTimeSeconds, projectileVz* deltaTimeSeconds);
+		projectilePosition += glm::vec3(projectileVx * deltaTimeSeconds, projectileVy * deltaTimeSeconds, projectileVz * deltaTimeSeconds);
 		projectileVy -= gravity * deltaTimeSeconds;
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(projectilePosition.x, projectilePosition.y + 0.75, projectilePosition.z));
 		for (int i = 0; i < ground->positions.size(); i++)
@@ -148,7 +144,6 @@ void TerrainGenerator::Update(float deltaTimeSeconds)
 		RenderSimpleMesh(meshes["sphere"], shaders["VertexNormal"], modelMatrix, glm::vec3(0, 1, 0));
 	}
 
-
 	// Render the point light in the scene
 	{
 		glm::mat4 modelMatrix = glm::mat4(1);
@@ -157,7 +152,6 @@ void TerrainGenerator::Update(float deltaTimeSeconds)
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(1));
 		//RenderSimpleMesh(meshes["sphere"], shaders["VertexColor"], modelMatrix, glm::vec3(1, 0, 0));
 	}
-
 
 	// Rotate and draw the skybox
 	{
@@ -202,7 +196,7 @@ void TerrainGenerator::RenderSimpleMesh(Mesh* mesh, Shader* shader, const glm::m
 	int eye_position = glGetUniformLocation(shader->program, "eye_position");
 	glUniform3f(eye_position, eyePosition.x, eyePosition.y, eyePosition.z);
 
-	// Set material property uniforms (shininess, kd, ks, object color) 
+	// Set material property uniforms (shininess, kd, ks, object color)
 	int material_shininess = glGetUniformLocation(shader->program, "material_shininess");
 	glUniform1i(material_shininess, materialShininess);
 
@@ -239,7 +233,6 @@ void TerrainGenerator::RenderSimpleMesh(Mesh* mesh, Shader* shader, const glm::m
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture1->GetTextureID());
 		glUniform1i(glGetUniformLocation(shader->program, "texture_1"), 0);
-
 	}
 
 	if (texture2)
@@ -257,7 +250,6 @@ void TerrainGenerator::RenderSimpleMesh(Mesh* mesh, Shader* shader, const glm::m
 	glDrawElements(mesh->GetDrawMode(), static_cast<int>(mesh->indices.size()), GL_UNSIGNED_SHORT, 0);
 }
 
-
 void TerrainGenerator::RenderTexturedMesh(Mesh* mesh, Shader* shader, const glm::mat4& modelMatrix, int textureID)
 {
 	if (!mesh || !shader || !shader->program)
@@ -271,12 +263,10 @@ void TerrainGenerator::RenderTexturedMesh(Mesh* mesh, Shader* shader, const glm:
 	mesh->Render(textureID);
 }
 
-
 Mesh* TerrainGenerator::GenerateTerrain(int width, int length)
 {
 	int imgW, imgH, channels;
 	unsigned char* data = stbi_load((RESOURCE_PATH::TEXTURES + "heightmap.jpg").c_str(), &imgW, &imgH, &channels, 0);
-
 
 	const int size = width * length;
 	vector<glm::vec3> verts(size), norms(size);
@@ -332,7 +322,6 @@ Mesh* TerrainGenerator::GenerateTerrain(int width, int length)
 
 			i++;
 		}
-
 
 	Mesh* mesh = new Mesh("terrain");
 	mesh->InitFromData(verts, norms, indices);
@@ -421,7 +410,7 @@ void TerrainGenerator::OnKeyPress(int key, int mods)
 	{
 		cout << camera->position << "  " << camera->forward << " " << camera->right << " " << camera->up << endl;
 
-		if(!turn)
+		if (!turn)
 			camera->Set(Player1CameraPosition, Player1CameraForward, Player1CameraRight, Player1CameraUp);
 		else
 			camera->Set(Player2CameraPosition, Player2CameraForward, Player2CameraRight, Player2CameraUp);
@@ -442,41 +431,24 @@ void TerrainGenerator::OnKeyRelease(int key, int mods)
 
 void TerrainGenerator::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
 {
-
 	if (window->MouseHold(GLFW_MOUSE_BUTTON_RIGHT))
 	{
 		float sensivityOX = 0.001f;
 		float sensivityOY = 0.001f;
 
-		//if (window->GetSpecialKeyState() == 0) {
-		//	renderCameraTarget = false;
-		//	//  rotate the camera in First-person mode around OX and OY using deltaX and deltaY
-		//	// use the sensitivity variables for setting up the rotation speed
-		//	camera->RotateFirstPerson_OX(-sensivityOX * deltaY);
-		//	camera->RotateFirstPerson_OY(-sensivityOY * deltaX);
-		//}
-
-		//if (window->GetSpecialKeyState() && GLFW_MOD_CONTROL) {
-			renderCameraTarget = true;
-			//  rotate the camera in Third-person mode around OX and OY using deltaX and deltaY
-			// use the sensitivity variables for setting up the rotation speed
-			camera->RotateThirdPerson_OX(-sensivityOX * deltaY);
-			camera->RotateThirdPerson_OY(-sensivityOY * deltaX);
-		//}
-
+		renderCameraTarget = true;
+		//  rotate the camera in Third-person mode around OX and OY using deltaX and deltaY
+		camera->RotateThirdPerson_OX(-sensivityOX * deltaY);
+		camera->RotateThirdPerson_OY(-sensivityOY * deltaX);
 	}
-
-	// add mouse move event
 }
 
 void TerrainGenerator::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 {
-	// add mouse button press event
 }
 
 void TerrainGenerator::OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods)
 {
-	// add mouse button release event
 }
 
 void TerrainGenerator::OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY)

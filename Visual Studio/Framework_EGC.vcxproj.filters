@@ -141,10 +141,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
-    <None Include="..\Source\Game\Shaders\FragmentShader3.glsl">
+    <None Include="..\Source\Game\Shaders\FragmentShader.glsl">
       <Filter>Game\Shaders</Filter>
     </None>
-    <None Include="..\Source\Game\Shaders\VertexShader3.glsl">
+    <None Include="..\Source\Game\Shaders\VertexShader.glsl">
       <Filter>Game\Shaders</Filter>
     </None>
   </ItemGroup>

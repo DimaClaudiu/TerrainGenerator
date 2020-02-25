@@ -60,8 +60,8 @@
     <ClInclude Include="..\Source\include\utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Source\Game\Shaders\FragmentShader3.glsl" />
-    <None Include="..\Source\Game\Shaders\VertexShader3.glsl" />
+    <None Include="..\Source\Game\Shaders\FragmentShader.glsl" />
+    <None Include="..\Source\Game\Shaders\VertexShader.glsl" />
     <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
